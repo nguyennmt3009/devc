@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+</head>
+
+<body>
+    <p id="abc"></p>
+    <hr>
+    <button onclick="generate()">Generate Array</button>
+    <hr>
+    Enter a number: <input type="number" id="num">
+    <button onclick="find()">Find Child Array</button><hr>
+    <p id="res"></p>
+    <script>
+        var number = [];
+
+        function generate() {
+            number = [];
+            for (var i = 0; i < 10; i++) {
+                number.push(Math.floor(Math.random() * 10));
+            }
+            console.log(number);
+            document.getElementById("abc").innerHTML = number;
+        }
+        generate();
+
+        function find(){
+            subArraySum(number, number.length, document.getElementById("num").value);
+
+        };
+
+        function subArraySum(arr, n, sum)
+        {
+            var curr_sum, i, j;
+
+            // Pick a starting point 
+            for (i = 0; i < n; i++) {
+                curr_sum = arr[i];
+
+                // try all subarrays starting with 'i' 
+                for (j = i + 1; j <= n; j++) {
+                    if (curr_sum == sum) {
+                        var p = j - 1;
+                        var str = "Sum found between indexes " + i + " and " + p;
+                        // alert(str);
+                        var result = [];
+                        for (var k = i; k <= p ; k++) {
+                            result.push(number[k]);
+                        }
+                        document.getElementById("res").innerHTML = result;
+
+                        return 1;
+                    }
+                    if (curr_sum > sum || j == n)
+                        break;
+                    curr_sum = curr_sum + arr[j];
+                }
+            }
+            document.getElementById("res").innerHTML("No subarray found");
+            return 0;
+        } 
+    </script>
+</body>
+
+</html>

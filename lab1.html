@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+</head>
+<body>
+    <h1>Currency Converter</h1>
+    <h2>Select input currency</h2>
+    <input type="radio" name="currency" id="usd" value="usd" > USD <br><br>
+    <input type="radio" name="currency" id="eur" value="eur"> EUR <br><br>
+
+    <input type="text" id="amount" onkeyup="main()">
+    <button onclick="main()">Convert Currency</button> <br> <br>
+    Result: <span id="result"></span>
+    <script>
+        function callApi(currency) {
+            
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'https://api.exchangerate-api.com/v4/latest/' + currency);
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    updateResults(JSON.parse(xhr.responseText));
+                }
+                else {
+                    alert('Request failed.  Returned status of ' + xhr.status);
+                }
+            };
+            xhr.send();
+        }
+
+        function main() {
+            callApi("USD")
+            
+            
+        }
+
+        function updateResults(response) {
+
+            if (document.getElementById('usd').checked) {
+                document.getElementById("result").innerHTML = response.rates.VND * document.getElementById("amount").value + " VND";
+            } 
+            if (document.getElementById('eur').checked) {
+                document.getElementById("result").innerHTML = (response.rates.VND / response.rates.EUR) * document.getElementById("amount").value + " VND";
+            }
+        }
+    </script>
+</body>
+</html>
