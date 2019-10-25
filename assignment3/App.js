@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, FlatList  } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, FlatList, Image  } from 'react-native';
 
 const CHOICES = [
     {
@@ -12,26 +12,99 @@ const CHOICES = [
     },
     {
       name: 'scissors',
-      uri:
-        'http://pluspng.com/img-png/png-hairdressing-scissors-beauty-salon-scissors-clipart-4704.png'
-    }
+      uri:'http://pluspng.com/img-png/png-hairdressing-scissors-beauty-salon-scissors-clipart-4704.png'
+    } 
   ];
 
 
 export default function App() {
-    const [gamePromt, setGamePromt] = useState("Fire")
+    const [gamePrompt, setGamePrompt] = useState('Choose your weapon!');
+    const [userChoice, setUserChoice] = useState({});
+    const [computerChoice, setComputerChoice] = useState({});
+
+    this.state = {
+      gamePrompt: 'Fire!',
+      userChoice: {},
+      computerChoice: {}
+    }
+
+    const getRoundOutcome = userChoice => {
+      const computerChoice = randomComputerChoice().name;
+      let result;
+
+      if (userChoice === 'rock') {
+        result = computerChoice === 'scissors' ? 'Victory!' : 'Defeat!';
+      }
+      if (userChoice === 'paper') {
+        result = computerChoice === 'rock' ? 'Victory!' : 'Defeat!';
+      }
+      if (userChoice === 'scissors') {
+        result = computerChoice === 'paper' ? 'Victory!' : 'Defeat!';
+      }
+
+      if (userChoice === computerChoice) result = 'Tie game!';
+      return [result, computerChoice];
+    };
+
+    const randomComputerChoice = () =>
+      CHOICES[Math.floor(Math.random() * CHOICES.length)];
+
+
+    const onPress = playerChoice => {
+          const [result, compChoice] = getRoundOutcome(playerChoice);
+          const newUserChoice = CHOICES.find(choice => choice.name === playerChoice);
+          const newComputerChoice = CHOICES.find(choice => choice.name === compChoice);
+          // alert(JSON.stringify(newUserChoice) + " " +JSON.stringify(newComputerChoice))
+
+          setGamePrompt(result);
+          setComputerChoice(newComputerChoice);
+          setUserChoice(newUserChoice)
+    };
+    const getResultColor = () => {
+      if (gamePrompt === 'Victory!') return 'green';
+      if (gamePrompt === 'Defeat!') return 'red';
+      return null;
+    };
     return (
       <View style={styles.container}>
+        <Text style={{fontSize:20, color:getResultColor()}}>{gamePrompt}</Text>
+        <View style={{flexDirection:"row", alignItems:"center"}}>
+          <View style={styles.choicesContainer}>
+            <ChoiceCard player="Player" choice={userChoice} />
+            <Text>vs</Text>
+            <ChoiceCard player="Computer" choice={computerChoice} />
+          </View>
+        </View>
         <View>
-          <Text>Please enter the value of the currency you want to convert!</Text>
           <FlatList 
           data={CHOICES}
-          renderItem={(item)=> <CustomButton name={item.item.name} uri={item.item.uri}/>} 
+          renderItem={(item)=> <CustomButton name={item.item.name} uri={item.item.uri} onPress={onPress}/>} 
           />
         </View>
       </View>
     );
 }
+
+class ChoiceCard extends React.Component {
+  constructor(props){
+    super(props);
+  }
+
+
+  render () 
+  {
+      const title = this.props.choice.name && this.props.choice.name.charAt(0).toUpperCase() + this.props.choice.name.slice(1);
+
+    return (
+    <View style={styles.choiceContainer}>
+      <Text style={styles.choiceDescription}>{this.props.player}</Text>
+      <Image source={{ uri:this.props.choice.uri}} resizeMode="contain" style={styles.choiceImage} />
+      <Text style={styles.choiceCardTitle}>{title}</Text>
+    </View>
+    )
+  }
+}
+
 
 class CustomButton extends React.Component {
   constructor(props){
@@ -40,14 +113,15 @@ class CustomButton extends React.Component {
 
     }
   }
+  
 
   render () 
   {
     return (
     <View style={styles.buttonContainer}>
-      <TouchableOpacity style={styles.buttonStyle}>
+      <TouchableOpacity style={styles.buttonStyle} onPress={() => this.props.onPress(this.props.name)}>
         <Text style={styles.buttonText}>
-          {this.props.name}
+          {this.props.name.charAt(0).toUpperCase() + this.props.name.slice(1)}
         </Text>
       </TouchableOpacity>
     </View>
@@ -61,6 +135,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
+        alignItems:"center",
         backgroundColor: '#e9ebee'
       },
       buttonContainer: {
