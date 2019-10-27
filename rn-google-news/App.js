@@ -1,15 +1,35 @@
-import React from 'react';
-import { StyleSheet, Text, View, FlatList, SafeAreaView } from 'react-native';
-import { resolveUri } from 'expo-asset/build/AssetSources';
+import * as React from 'react';
+import { Text, View, StyleSheet, FlatList, SafeAreaView, Button } from 'react-native';
 
-function Item({ title }) {
+// You can import from local files
+
+// or any pure javascript modules available in npm
+import { Card } from 'react-native-paper';
+
+function Item({ title, imageUrl, content, publishedAt }) {
   return (
-    <View style={styles.item}>
-      <Text style={styles.title}>{title}</Text>
+    <View style={styles.container}>
+      <Card 
+        title={title} 
+        image={{uri: imageUrl}}
+      >
+        <View style={styles.row}>
+          <Text style={styles.label}>Source</Text>
+          <Text style={styles.info}>{title}</Text>
+        </View>
+        <Text >{content}</Text>
+        <View style={styles.row}>
+          <Text style={styles.label}>Published</Text>
+          <Text style={styles.info}>
+            {publishedAt}
+          </Text>
+        </View>
+        <Button title="Read more" backgroundColor="#03A9F4" />
+              
+      </Card>
     </View>
   );
 }
-
 export default class App extends React.Component {
   constructor(props) {
     super(props)
@@ -19,7 +39,6 @@ export default class App extends React.Component {
     };
     
   }
-
   componentDidMount() {
     this.getNews()
   }
@@ -34,28 +53,52 @@ export default class App extends React.Component {
 
   }
   render() {
-    if (this.state.loading) {
-      return (
-        <View style={styles.container}> 
-          <Text>Loading...</Text>
-        </View>
-      )
-    } else {
-      console.log(this.state.articles[0].author) 
-      return (
-        
-      );
-    }
+    return (
+      <SafeAreaView style={styles.containerFlex}>
+          <FlatList
+            data = {this.state.articles}
+            renderItem={({ item }) => <Item 
+              title={item.source.name} 
+              imageUrl={item.urlToImage}
+              content={item.content}
+              publishedAt={item.publishedAt}
+            />}
+            keyExtractor={item => item.url}
+          />
+        </SafeAreaView>
+    );
   }
 }
 
-
-
 const styles = StyleSheet.create({
+  containerFlex: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    marginTop: 40,
     alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: '#fff',
+    justifyContent: 'center'
   },
+  header: {
+    height: 30,
+    width: '100%',
+    backgroundColor: 'pink'
+  },
+  row: {
+    flexDirection: 'row'
+  },
+  label: {
+    fontSize: 16,
+    color: 'black',
+    marginRight: 10,
+    fontWeight: 'bold'
+  },
+  info: {
+    fontSize: 16,
+    color: 'grey'
+  }
 });
